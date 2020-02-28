@@ -13,7 +13,7 @@ Instead of including `0Harmony.dll` in your `Assemblies` folder, you use the Har
         <packageId>brrainz.harmony</packageId>
         <displayName>Harmony</displayName>
         <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-        <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/download/v1.0.0/Harmony.zip</downloadUrl>
+        <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
     </li>
 </modDependencies>
 ```
