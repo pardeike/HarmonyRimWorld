@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -7,8 +8,11 @@ namespace HarmonyMod
 {
 	public class HarmonyMain : Mod
 	{
+		public static Version harmonyVersion = default;
+
 		public HarmonyMain(ModContentPack content) : base(content)
 		{
+			_ = Harmony.VersionInfo(out harmonyVersion);
 			var harmony = new Harmony("net.pardeike.rimworld.lib.harmony");
 			harmony.PatchAll();
 		}
@@ -20,13 +24,10 @@ namespace HarmonyMod
 	{
 		public static void Postfix()
 		{
-			_ = Harmony.VersionInfo(out var version);
-			var harmonyVersion = $"Harmony v{version}";
-
 			Text.Font = GameFont.Small;
 			GUI.color = new Color(1f, 1f, 1f, 0.5f);
 			var rect = new Rect(10f, 59f, 330f, 20f);
-			Widgets.Label(rect, harmonyVersion);
+			Widgets.Label(rect, $"Harmony v{HarmonyMain.harmonyVersion}");
 			GUI.color = Color.white;
 		}
 	}
