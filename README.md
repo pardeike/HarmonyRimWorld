@@ -17,7 +17,7 @@ Instead of including `0Harmony.dll` in your `Assemblies` folder, you use the Har
             <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
         </li>
     </v1.1>
-<modDependenciesByVersion>
+</modDependenciesByVersion>
 ```
 
 which will make RimWorld 1.1 force the user to install this mod. It will automatically want to be installed high up in the list which makes it supply `Harmony` to all mods below. This means that all mods will use **the same Harmony version**.
