@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 
@@ -9,6 +10,10 @@ namespace HarmonyMod
 	public class HarmonyMain : Mod
 	{
 		public static Version harmonyVersion = default;
+		public static string modVersion = ((AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(
+			 Assembly.GetExecutingAssembly(),
+			 typeof(AssemblyFileVersionAttribute), false)
+		).Version;
 
 		public HarmonyMain(ModContentPack content) : base(content)
 		{
@@ -26,8 +31,8 @@ namespace HarmonyMod
 		{
 			Text.Font = GameFont.Small;
 			GUI.color = new Color(1f, 1f, 1f, 0.5f);
-			var rect = new Rect(10f, 59f, 330f, 20f);
-			Widgets.Label(rect, $"Harmony v{HarmonyMain.harmonyVersion}");
+			var rect = new Rect(10f, 58f, 330f, 20f);
+			Widgets.Label(rect, $"Harmony: Lib v{HarmonyMain.harmonyVersion}, Mod v{HarmonyMain.modVersion}");
 			GUI.color = Color.white;
 		}
 	}

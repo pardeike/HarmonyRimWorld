@@ -223,7 +223,7 @@
             
         </member>
         <member name="M:HarmonyLib.PatchFunctions.GetSortedPatchMethods(System.Reflection.MethodBase,HarmonyLib.Patch[],System.Boolean)">
-             <summary>Gets sorted patch methods</summary>
+             <summary>Sorts patch methods by their priority rules</summary>
              <param name="original">The original method</param>
              <param name="patches">Patches to sort</param>
              <param name="debug">Use debug mode</param>
@@ -777,20 +777,20 @@
             
         </member>
         <member name="M:HarmonyLib.Harmony.UnpatchAll(System.String)">
-             <summary>Unpatches methods</summary>
-             <param name="harmonyID">The optional Harmony ID to restrict unpatching to a specific instance</param>
+             <summary>Unpatches methods by patching them with zero patches. Fully unpatching is not supported. Be careful, unpatching is global</summary>
+             <param name="harmonyID">The optional Harmony ID to restrict unpatching to a specific Harmony instance</param>
              <remarks>This method could be static if it wasn't for the fact that unpatching creates a new replacement method that contains your harmony ID</remarks>
             
         </member>
         <member name="M:HarmonyLib.Harmony.Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)">
-             <summary>Unpatches a method</summary>
+             <summary>Unpatches a method by patching it with zero patches. Fully unpatching is not supported. Be careful, unpatching is global</summary>
              <param name="original">The original method/constructor</param>
              <param name="type">The <see cref="T:HarmonyLib.HarmonyPatchType"/></param>
-             <param name="harmonyID">The optional Harmony ID to restrict unpatching to a specific instance</param>
+             <param name="harmonyID">The optional Harmony ID to restrict unpatching to a specific Harmony instance</param>
             
         </member>
         <member name="M:HarmonyLib.Harmony.Unpatch(System.Reflection.MethodBase,System.Reflection.MethodInfo)">
-             <summary>Unpatches a method</summary>
+             <summary>Unpatches a method by patching it with zero patches. Fully unpatching is not supported. Be careful, unpatching is global</summary>
              <param name="original">The original method/constructor</param>
              <param name="patch">The patch method as method to remove</param>
             
@@ -1367,10 +1367,22 @@
              <returns>The patch information as <see cref="T:HarmonyLib.Patches"/></returns>
             
         </member>
+        <member name="M:HarmonyLib.PatchProcessor.GetSortedPatchMethods(System.Reflection.MethodBase,HarmonyLib.Patch[])">
+             <summary>Sort patch methods by their priority rules</summary>
+             <param name="original">The original method</param>
+             <param name="patches">Patches to sort</param>
+             <returns>The sorted patch methods</returns>
+            
+        </member>
         <member name="M:HarmonyLib.PatchProcessor.VersionInfo(System.Version@)">
              <summary>Gets Harmony version for all active Harmony instances</summary>
              <param name="currentVersion">[out] The current Harmony version</param>
              <returns>A dictionary containing assembly version keyed by Harmony ID</returns>
+            
+        </member>
+        <member name="M:HarmonyLib.PatchProcessor.CreateILGenerator">
+            <summary>Creates a new <see cref="T:System.Reflection.Emit.ILGenerator">generator</see> to use when reading method bodies</summary>
+            <returns>A new <see cref="T:System.Reflection.Emit.ILGenerator"/></returns>
             
         </member>
         <member name="M:HarmonyLib.PatchProcessor.GetOriginalInstructions(System.Reflection.MethodBase,System.Reflection.Emit.ILGenerator)">
@@ -1387,9 +1399,32 @@
             <returns>A list containing all the original <see cref="T:HarmonyLib.CodeInstruction"/></returns>
             
         </member>
+        <member name="M:HarmonyLib.PatchProcessor.GetCurrentInstructions(System.Reflection.MethodBase,System.Int32,System.Reflection.Emit.ILGenerator)">
+            <summary>Returns the methods current list of code instructions after all existing transpilers have been applied</summary>
+            <param name="original">The original method/constructor</param>
+            <param name="maxTranspilers">Apply only the first count of transpilers</param>
+            <param name="generator">Optionally an existing generator that will be used to create all local variables and labels contained in the result (if not specified, an internal generator is used)</param>
+            <returns>A list of <see cref="T:HarmonyLib.CodeInstruction"/></returns>
+            
+        </member>
+        <member name="M:HarmonyLib.PatchProcessor.GetCurrentInstructions(System.Reflection.MethodBase,System.Reflection.Emit.ILGenerator@,System.Int32)">
+            <summary>Returns the methods current list of code instructions after all existing transpilers have been applied</summary>
+            <param name="original">The original method/constructor</param>
+            <param name="generator">A new generator that now contains all local variables and labels contained in the result</param>
+            <param name="maxTranspilers">Apply only the first count of transpilers</param>
+            <returns>A list of <see cref="T:HarmonyLib.CodeInstruction"/></returns>
+            
+        </member>
         <member name="M:HarmonyLib.PatchProcessor.ReadMethodBody(System.Reflection.MethodBase)">
              <summary>A low level way to read the body of a method. Used for quick searching in methods</summary>
              <param name="method">The original method</param>
+             <returns>All instructions as opcode/operand pairs</returns>
+            
+        </member>
+        <member name="M:HarmonyLib.PatchProcessor.ReadMethodBody(System.Reflection.MethodBase,System.Reflection.Emit.ILGenerator)">
+             <summary>A low level way to read the body of a method. Used for quick searching in methods</summary>
+             <param name="method">The original method</param>
+             <param name="generator">An existing generator that will be used to create all local variables and labels contained in the result</param>
              <returns>All instructions as opcode/operand pairs</returns>
             
         </member>
@@ -1765,7 +1800,7 @@
         </member>
         <member name="M:HarmonyLib.AccessTools.FieldRefAccess``2(System.String)">
              <summary>Creates an instance field reference</summary>
-             <typeparam name="T">The class the field is defined in or "object" if type cannot be accessed at compile time</typeparam>
+             <typeparam name="T">The class the field is defined in</typeparam>
              <typeparam name="F">The type of the field</typeparam>
              <param name="fieldName">The name of the field</param>
              <returns>A read and writable field reference delegate</returns>
@@ -1773,25 +1808,27 @@
         </member>
         <member name="M:HarmonyLib.AccessTools.FieldRefAccess``2(``0,System.String)">
              <summary>Creates an instance field reference for a specific instance</summary>
-             <typeparam name="T">The class the field is defined in or "object" if type cannot be accessed at compile time</typeparam>
+             <typeparam name="T">The class the field is defined in</typeparam>
              <typeparam name="F">The type of the field</typeparam>
              <param name="instance">The instance</param>
              <param name="fieldName">The name of the field</param>
              <returns>An readable/assignable object representing the field</returns>
             
         </member>
+        <member name="M:HarmonyLib.AccessTools.FieldRefAccess``1(System.Type,System.String)">
+             <summary>Creates an instance field reference delegate for a private type</summary>
+             <typeparam name="F">The type of the field</typeparam>
+             <param name="type">The class/type</param>
+             <param name="fieldName">The name of the field</param>
+             <returns>A read and writable <see cref="T:HarmonyLib.AccessTools.FieldRef`2"/> delegate</returns>
+            
+        </member>
         <member name="M:HarmonyLib.AccessTools.FieldRefAccess``2(System.Reflection.FieldInfo)">
-             <summary>Creates an instance field reference delegate</summary>
+             <summary>Creates an instance field reference delegate for a fieldinfo</summary>
              <typeparam name="T">The class the field is defined in or "object" if type cannot be accessed at compile time</typeparam>
              <typeparam name="F">The type of the field</typeparam>
              <param name="fieldInfo">The field of the field</param>
              <returns>A read and writable <see cref="T:HarmonyLib.AccessTools.FieldRef`2"/> delegate</returns>
-            
-        </member>
-        <member name="T:HarmonyLib.AccessTools.FieldRef`1">
-             <summary>A read/writable reference delegate to a static field</summary>
-             <typeparam name="F">The type of the field</typeparam>
-             <returns>An readable/assignable object representing the static field</returns>
             
         </member>
         <member name="M:HarmonyLib.AccessTools.StaticFieldRefAccess``2(System.String)">
@@ -1799,6 +1836,28 @@
              <typeparam name="T">The class the field is defined in or "object" if type cannot be accessed at compile time</typeparam>
              <typeparam name="F">The type of the field</typeparam>
              <param name="fieldName">The name of the field</param>
+             <returns>An readable/assignable object representing the static field</returns>
+            
+        </member>
+        <member name="M:HarmonyLib.AccessTools.StaticFieldRefAccess``1(System.Type,System.String)">
+             <summary>Creates a static field reference</summary>
+             <typeparam name="F">The type of the field</typeparam>
+             <param name="type">The class/type</param>
+             <param name="fieldName">The name of the field</param>
+             <returns>An readable/assignable object representing the static field</returns>
+            
+        </member>
+        <member name="M:HarmonyLib.AccessTools.StaticFieldRefAccess``2(System.Reflection.FieldInfo)">
+             <summary>Creates a static field reference</summary>
+             <typeparam name="T">The class the field is defined in or "object" if type cannot be accessed at compile time</typeparam>
+             <typeparam name="F">The type of the field</typeparam>
+             <param name="fieldInfo">The field</param>
+             <returns>An readable/assignable object representing the static field</returns>
+            
+        </member>
+        <member name="T:HarmonyLib.AccessTools.FieldRef`1">
+             <summary>A read/writable reference delegate to a static field</summary>
+             <typeparam name="F">The type of the field</typeparam>
              <returns>An readable/assignable object representing the static field</returns>
             
         </member>
@@ -2152,6 +2211,15 @@
              <param name="items">The items to add</param>
              <returns>The array containing the items</returns>
             
+        </member>
+        <member name="T:HarmonyLib.MethodBaseExtensions">
+            <summary>General extensions for collections</summary>
+            
+        </member>
+        <member name="M:HarmonyLib.MethodBaseExtensions.HasMethodBody(System.Reflection.MethodBase)">
+            <summary>Tests a class member if it has an IL method body (external methods for example don't have a body)</summary>
+            <param name="member">The member to test</param>
+            <returns>Returns true if the member has an IL body or false if not</returns>
         </member>
         <member name="T:HarmonyLib.FileLog">
             <summary>A file log for debugging</summary>
