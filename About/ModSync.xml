@@ -2,7 +2,7 @@
 <ModSyncNinjaData>
   <ID>be673269-db56-463b-8c36-e074881e0d77</ID>
   <ModName>Harmony</ModName>
-  <Version>1.0.4.0</Version>
+  <Version>1.1.0.0</Version>
   <SaveBreaking>False</SaveBreaking>
   <Host name="Github">
     <Owner>pardeike</Owner>
