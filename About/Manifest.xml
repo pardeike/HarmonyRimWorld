@@ -15,6 +15,6 @@
   </loadBefore>
   <loadAfter>
   </loadAfter>
-  <manifestUri>https://raw.githubusercontent.com/pardeike/HarmonyRimWorld/v1.1.0.0/About/Manifest.xml</manifestUri>
+  <manifestUri>https://raw.githubusercontent.com/pardeike/HarmonyRimWorld/latest/About/Manifest.xml</manifestUri>
   <downloadUri>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUri>
 </Manifest>
