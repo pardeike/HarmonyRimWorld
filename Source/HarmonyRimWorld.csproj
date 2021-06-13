@@ -1,0 +1,87 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ProjectGuid>{C0C9BB35-9100-47A8-886E-32932EF301ED}</ProjectGuid>
+		<RootNamespace>HarmonyMod</RootNamespace>
+		<AssemblyName>HarmonyMod</AssemblyName>
+		<TargetFramework>net472</TargetFramework>
+		<LangVersion>8.0</LangVersion>
+		<PlatformTarget>x64</PlatformTarget>
+		<OutputPath>..\1.2\Assemblies\</OutputPath>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<Version>1.0.4.0</Version>
+		<Copyright>Copyright Andreas Pardeike</Copyright>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugSymbols>false</DebugSymbols>
+		<Optimize>true</Optimize>
+		<DebugType>none</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugSymbols>true</DebugSymbols>
+		<DefineConstants>RW12;TRACE;DEBUG</DefineConstants>
+		<Optimize>false</Optimize>
+		<DebugType>portable</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.2.2905" GeneratePathProperty="true" />
+		<PackageReference Include="Lib.Harmony" Version="2.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.2" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="TaskPubliciser" Version="1.0.3" />
+	</ItemGroup>
+
+	<Target Name="MyCode" BeforeTargets="UpdateReferences">
+		<PropertyGroup>
+			<AssemblyCSharp>$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll</AssemblyCSharp>
+			<PubliciseOutputPath>$(PkgKrafs_Rimworld_Ref)\ref\net472\</PubliciseOutputPath>
+			<AssemblyCSharp_Publicised>$(PubliciseOutputPath)Assembly-CSharp_publicised.dll</AssemblyCSharp_Publicised>
+		</PropertyGroup>
+		<Message Importance="High" Text="Publicising Rimworld Assembly ..." />
+		<Publicise TargetAssemblyPath="$(AssemblyCSharp)" OutputPath="$(PubliciseOutputPath)" Condition="Exists('$(AssemblyCSharp)')" />
+		<Message Importance="High" Text="Replacing reference to un-publicised assemblies with publicised equivalents ..." />
+		<ItemGroup>
+			<Reference Include="$(AssemblyCSharp_Publicised)">
+				<SpecificVersion>false</SpecificVersion>
+				<HintPath>$(AssemblyCSharp_Publicised)</HintPath>
+				<Implicit>true</Implicit>
+				<Private>false</Private>
+			</Reference>
+		</ItemGroup>
+	</Target>
+
+	<Target Name="UpdateReferences" AfterTargets="ResolveLockFileReferences">
+		<Message Importance="High" Text="Remove References ..." />
+		<ItemGroup>
+			<Reference Remove="$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll" />
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup>
+		<PostBuildEvent>echo Postprocessing
+where ModBuilder 2&gt; nul | find /i "ModBuilder.exe"
+if not errorlevel 1 (
+	ModBuilder AssemblyVersion -file "$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll" -save "$(MSBuildProjectName)-version"
+	ModBuilder XMLPut -file "$(MSBuildProjectDirectory)\..\About\Manifest.xml" -xpath /Manifest/version -value "{{$(MSBuildProjectName)-version}}"
+)
+if defined INSTALL_MOD (
+	"%INSTALL_MOD%" "$(Configuration)" "$(MSBuildProjectDirectory)\..\" "$(MSBuildProjectName)" "1.1 1.2 About" "LoadFolders.xml"
+)</PostBuildEvent>
+		<Company>Brrainz</Company>
+		<Authors>Andreas Pardeike</Authors>
+		<Description></Description>
+		<PackageProjectUrl>https://github.com/pardeike/HarmonyMod</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/pardeike/HarmonyMod</RepositoryUrl>
+		<Product>Harmony</Product>
+	</PropertyGroup>
+
+</Project>
