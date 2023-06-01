@@ -7,6 +7,7 @@ using Verse;
 
 namespace HarmonyMod
 {
+	[StaticConstructorOnStartup]
 	public class HarmonyMain : Mod
 	{
 		public static Version harmonyVersion = default;
@@ -15,12 +16,14 @@ namespace HarmonyMod
 			 typeof(AssemblyFileVersionAttribute), false)
 		).Version;
 
-		public HarmonyMain(ModContentPack content) : base(content)
+		static HarmonyMain()
 		{
 			_ = Harmony.VersionInfo(out harmonyVersion);
 			var harmony = new Harmony("net.pardeike.rimworld.lib.harmony");
 			harmony.PatchAll();
 		}
+
+		public HarmonyMain(ModContentPack content) : base(content) { }
 	}
 
 	[HarmonyPatch(typeof(VersionControl))]
@@ -30,9 +33,9 @@ namespace HarmonyMod
 		public static void Postfix()
 		{
 			Text.Font = GameFont.Small;
-			GUI.color = new Color(1f, 1f, 1f, 0.5f);
+			GUI.color = new Color(1f, 0.2f, 0.2f);
 			var rect = new Rect(10f, 58f, 330f, 20f);
-			Widgets.Label(rect, $"Harmony: Lib v{HarmonyMain.harmonyVersion}, Mod v{HarmonyMain.modVersion}");
+			Widgets.Label(rect, $"Harmony {HarmonyMain.harmonyVersion}-prerelease.2");
 			GUI.color = Color.white;
 		}
 	}

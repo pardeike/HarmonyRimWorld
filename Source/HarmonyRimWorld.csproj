@@ -1,17 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<ProjectGuid>{C0C9BB35-9100-47A8-886E-32932EF301ED}</ProjectGuid>
-		<RootNamespace>HarmonyMod</RootNamespace>
-		<AssemblyName>HarmonyMod</AssemblyName>
+		<RootNamespace>$(ModFileName)</RootNamespace>
+		<AssemblyName>$(ModFileName)</AssemblyName>
 		<TargetFramework>net472</TargetFramework>
-		<LangVersion>8.0</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<PlatformTarget>x64</PlatformTarget>
-		<OutputPath>..\Current\Assemblies\</OutputPath>
+		<OutputPath>bin</OutputPath>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<Version>1.5.0.0</Version>
+		<Version>$(ModVersion)</Version>
+		<AssemblyVersion>$(ModVersion)</AssemblyVersion>
+		<FileVersion>$(ModVersion)</FileVersion>
+		<PackageVersion>$(ModVersion)</PackageVersion>
+		<InformationalVersion>$(ModVersion)</InformationalVersion>
+		<Company>Brrainz</Company>
+		<Authors>Andreas Pardeike</Authors>
 		<Copyright>Copyright Andreas Pardeike</Copyright>
+		<PackageProjectUrl>$(Repository)</PackageProjectUrl>
+		<RepositoryUrl>$(Repository)</RepositoryUrl>
+		<Product>$(ModName)</Product>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -30,9 +38,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3507-beta" GeneratePathProperty="true" />
-		<PackageReference Include="Lib.Harmony" Version="2.2.2" />
-		<PackageReference Include="Microsoft.NETCore.Platforms" Version="6.0.5" />
+		<Content Include="..\Directory.Build.props">
+			<Link>%(Filename)%(Extension)</Link>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Brrainz.RimWorld.CrossPromotion" Version="1.1.1" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3704" GeneratePathProperty="true" />
+		<PackageReference Include="Lib.Harmony" Version="2.3.0-prerelease.2" />
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.2" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -66,24 +81,36 @@
 		</ItemGroup>
 	</Target>
 
-	<PropertyGroup>
-		<PostBuildEvent>
-			echo Postprocessing
-			where ModBuilder 2&gt; nul | find /i "ModBuilder.exe"
-			if not errorlevel 1 (
-			ModBuilder AssemblyVersion -file "$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll" -save "$(MSBuildProjectName)-version"
-			ModBuilder XMLPut -file "$(MSBuildProjectDirectory)\..\About\Manifest.xml" -xpath /Manifest/version -value "{{$(MSBuildProjectName)-version}}"
-			)
-			if defined INSTALL_MOD (
-			"%INSTALL_MOD%" "$(Configuration)" "$(MSBuildProjectDirectory)\..\" "$(MSBuildProjectName)" "About Current" "LoadFolders.xml"
-			)
-		</PostBuildEvent>
-		<Company>Brrainz</Company>
-		<Authors>Andreas Pardeike</Authors>
-		<Description></Description>
-		<PackageProjectUrl>https://github.com/pardeike/HarmonyMod</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/pardeike/HarmonyMod</RepositoryUrl>
-		<Product>Harmony</Product>
-	</PropertyGroup>
+	<Target Name="PostBuildAction" AfterTargets="Build">
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
+		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
+	</Target>
+
+	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
+		<Copy SourceFiles="bin\0Harmony.dll" DestinationFiles="..\Current\Assemblies\_03_Harmony.dll" />
+		<Copy SourceFiles="bin\HarmonyMod.dll" DestinationFiles="..\Current\Assemblies\_04_HarmonyMod.dll" />
+		<Copy SourceFiles="bin\Mono.Cecil.dll" DestinationFiles="..\Current\Assemblies\_01_Mono.Cecil.dll" />
+		<Copy SourceFiles="bin\Mono.Cecil.Mdb.dll" DestinationFiles="..\Current\Assemblies\_07_Mono.Cecil.Mdb.dll" />
+		<Copy SourceFiles="bin\Mono.Cecil.Pdb.dll" DestinationFiles="..\Current\Assemblies\_08_Mono.Cecil.Pdb.dll" />
+		<Copy SourceFiles="bin\Mono.Cecil.Rocks.dll" DestinationFiles="..\Current\Assemblies\_09_Mono.Cecil.Rocks.dll" />
+		<Copy SourceFiles="bin\MonoMod.Backports.dll" DestinationFiles="..\Current\Assemblies\_10_MonoMod.Backports.dll" />
+		<Copy SourceFiles="bin\MonoMod.Core.dll" DestinationFiles="..\Current\Assemblies\_06_MonoMod.Core.dll" />
+		<Copy SourceFiles="bin\MonoMod.Iced.dll" DestinationFiles="..\Current\Assemblies\_05_MonoMod.Iced.dll" />
+		<Copy SourceFiles="bin\MonoMod.ILHelpers.dll" DestinationFiles="..\Current\Assemblies\_11_MonoMod.ILHelpers.dll" />
+		<Copy SourceFiles="bin\MonoMod.Utils.dll" DestinationFiles="..\Current\Assemblies\_02_MonoMod.Utils.dll" />
+		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
+		<ItemGroup>
+			<CopyAbout Include="..\About\**" />
+			<CopyCurrent Include="..\Current\**" />
+			<CopyLicense Include="..\LICENSE" />
+			<CopyLoadFolders Include="..\LoadFolders.xml" />
+			<CopyReadme Include="..\Readme.md" />
+		</ItemGroup>
+		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
+		<Copy SourceFiles="@(CopyCurrent)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Current\%(RecursiveDir)" />
+		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
+		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
+		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
+	</Target>
 
 </Project>
