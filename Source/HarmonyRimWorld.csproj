@@ -44,10 +44,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Brrainz.RimWorld.CrossPromotion" Version="1.1.1" />
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3704" GeneratePathProperty="true" />
-		<PackageReference Include="Lib.Harmony" Version="2.3.0-prerelease.2" />
-		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.2" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3901" GeneratePathProperty="true" />
+		<PackageReference Include="Lib.Harmony" Version="2.3.0-prerelease.4" />
+		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -98,6 +97,7 @@
 		<Copy SourceFiles="bin\MonoMod.Iced.dll" DestinationFiles="..\Current\Assemblies\_05_MonoMod.Iced.dll" />
 		<Copy SourceFiles="bin\MonoMod.ILHelpers.dll" DestinationFiles="..\Current\Assemblies\_11_MonoMod.ILHelpers.dll" />
 		<Copy SourceFiles="bin\MonoMod.Utils.dll" DestinationFiles="..\Current\Assemblies\_02_MonoMod.Utils.dll" />
+		<Copy SourceFiles="bin\System.ValueTuple.dll" DestinationFiles="..\Current\Assemblies\_00_System.ValueTuple.dll" />
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<ItemGroup>
 			<CopyAbout Include="..\About\**" />

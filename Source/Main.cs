@@ -1,20 +1,15 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
-using System.Reflection;
 using UnityEngine;
 using Verse;
 
 namespace HarmonyMod
 {
 	[StaticConstructorOnStartup]
-	public class HarmonyMain : Mod
+	public class HarmonyMain(ModContentPack content) : Mod(content)
 	{
 		public static Version harmonyVersion = default;
-		public static string modVersion = ((AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(
-			 Assembly.GetExecutingAssembly(),
-			 typeof(AssemblyFileVersionAttribute), false)
-		).Version;
 
 		static HarmonyMain()
 		{
@@ -22,8 +17,6 @@ namespace HarmonyMod
 			var harmony = new Harmony("net.pardeike.rimworld.lib.harmony");
 			harmony.PatchAll();
 		}
-
-		public HarmonyMain(ModContentPack content) : base(content) { }
 	}
 
 	[HarmonyPatch(typeof(VersionControl))]
@@ -35,7 +28,7 @@ namespace HarmonyMod
 			Text.Font = GameFont.Small;
 			GUI.color = new Color(1f, 0.2f, 0.2f);
 			var rect = new Rect(10f, 58f, 330f, 20f);
-			Widgets.Label(rect, $"Harmony {HarmonyMain.harmonyVersion}-prerelease.2");
+			Widgets.Label(rect, $"Harmony {HarmonyMain.harmonyVersion}");
 			GUI.color = Color.white;
 		}
 	}
