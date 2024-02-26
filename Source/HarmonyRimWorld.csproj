@@ -44,41 +44,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3901" GeneratePathProperty="true" />
-		<PackageReference Include="Lib.Harmony" Version="2.3.0-prerelease.4" />
 		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="TaskPubliciser" Version="1.0.3" />
 	</ItemGroup>
 
-	<Target Name="MyCode" BeforeTargets="UpdateReferences">
-		<PropertyGroup>
-			<AssemblyCSharp>$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll</AssemblyCSharp>
-			<PubliciseOutputPath>$(PkgKrafs_Rimworld_Ref)\ref\net472\</PubliciseOutputPath>
-			<AssemblyCSharp_Publicised>$(PubliciseOutputPath)Assembly-CSharp_publicised.dll</AssemblyCSharp_Publicised>
-		</PropertyGroup>
-		<Message Importance="High" Text="Publicising Rimworld Assembly ..." />
-		<Publicise TargetAssemblyPath="$(AssemblyCSharp)" OutputPath="$(PubliciseOutputPath)" Condition="Exists('$(AssemblyCSharp)')" />
-		<Message Importance="High" Text="Replacing reference to un-publicised assemblies with publicised equivalents ..." />
-		<ItemGroup>
-			<Reference Include="$(AssemblyCSharp_Publicised)">
-				<SpecificVersion>false</SpecificVersion>
-				<HintPath>$(AssemblyCSharp_Publicised)</HintPath>
-				<Implicit>true</Implicit>
-				<Private>false</Private>
-			</Reference>
-		</ItemGroup>
-	</Target>
-
-	<Target Name="UpdateReferences" AfterTargets="ResolveLockFileReferences">
-		<Message Importance="High" Text="Remove References ..." />
-		<ItemGroup>
-			<Reference Remove="$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll" />
-		</ItemGroup>
-	</Target>
+	<ItemGroup>
+	  <Reference Include="0Harmony">
+	    <HintPath>..\Current\Assemblies\0Harmony.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	  <Reference Include="Assembly-CSharp">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	  <Reference Include="UnityEngine.CoreModule">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	  <Reference Include="UnityEngine.IMGUIModule">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	</ItemGroup>
 
 	<Target Name="PostBuildAction" AfterTargets="Build">
 		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
@@ -86,18 +76,7 @@
 	</Target>
 
 	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
-		<Copy SourceFiles="bin\0Harmony.dll" DestinationFiles="..\Current\Assemblies\_03_Harmony.dll" />
-		<Copy SourceFiles="bin\HarmonyMod.dll" DestinationFiles="..\Current\Assemblies\_04_HarmonyMod.dll" />
-		<Copy SourceFiles="bin\Mono.Cecil.dll" DestinationFiles="..\Current\Assemblies\_01_Mono.Cecil.dll" />
-		<Copy SourceFiles="bin\Mono.Cecil.Mdb.dll" DestinationFiles="..\Current\Assemblies\_07_Mono.Cecil.Mdb.dll" />
-		<Copy SourceFiles="bin\Mono.Cecil.Pdb.dll" DestinationFiles="..\Current\Assemblies\_08_Mono.Cecil.Pdb.dll" />
-		<Copy SourceFiles="bin\Mono.Cecil.Rocks.dll" DestinationFiles="..\Current\Assemblies\_09_Mono.Cecil.Rocks.dll" />
-		<Copy SourceFiles="bin\MonoMod.Backports.dll" DestinationFiles="..\Current\Assemblies\_10_MonoMod.Backports.dll" />
-		<Copy SourceFiles="bin\MonoMod.Core.dll" DestinationFiles="..\Current\Assemblies\_06_MonoMod.Core.dll" />
-		<Copy SourceFiles="bin\MonoMod.Iced.dll" DestinationFiles="..\Current\Assemblies\_05_MonoMod.Iced.dll" />
-		<Copy SourceFiles="bin\MonoMod.ILHelpers.dll" DestinationFiles="..\Current\Assemblies\_11_MonoMod.ILHelpers.dll" />
-		<Copy SourceFiles="bin\MonoMod.Utils.dll" DestinationFiles="..\Current\Assemblies\_02_MonoMod.Utils.dll" />
-		<Copy SourceFiles="bin\System.ValueTuple.dll" DestinationFiles="..\Current\Assemblies\_00_System.ValueTuple.dll" />
+		<Copy SourceFiles="bin\HarmonyMod.dll" DestinationFiles="..\Current\Assemblies\HarmonyMod.dll" />
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<ItemGroup>
 			<CopyAbout Include="..\About\**" />

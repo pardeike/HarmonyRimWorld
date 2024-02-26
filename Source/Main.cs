@@ -26,9 +26,9 @@ namespace HarmonyMod
 		public static void Postfix()
 		{
 			Text.Font = GameFont.Small;
-			GUI.color = new Color(1f, 0.2f, 0.2f);
+			GUI.color = new Color(1f, 1f, 1f, 0.5f);
 			var rect = new Rect(10f, 58f, 330f, 20f);
-			Widgets.Label(rect, $"Harmony {HarmonyMain.harmonyVersion}");
+			Widgets.Label(rect, $"Harmony v{HarmonyMain.harmonyVersion}");
 			GUI.color = Color.white;
 		}
 	}
