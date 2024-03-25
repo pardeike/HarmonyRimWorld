@@ -1,11 +1,11 @@
 <Project>
 
-    <PropertyGroup>
-        <ModName>HarmonyMod</ModName>
-        <ModFileName>HarmonyMod</ModFileName>
-        <Repository>https://github.com/pardeike/HarmonyRimworld</Repository>
-        <ModVersion>2.0.0.0</ModVersion>
-        <ProjectGuid>{C0C9BB35-9100-47A8-886E-32932EF301ED}</ProjectGuid>
-    </PropertyGroup>
+	<PropertyGroup>
+		<ModName>HarmonyMod</ModName>
+		<ModFileName>HarmonyMod</ModFileName>
+		<Repository>https://github.com/pardeike/HarmonyRimworld</Repository>
+		<ModVersion>2.1.0.0</ModVersion>
+		<ProjectGuid>{C0C9BB35-9100-47A8-886E-32932EF301ED}</ProjectGuid>
+	</PropertyGroup>
 
 </Project>

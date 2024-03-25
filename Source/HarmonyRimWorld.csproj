@@ -44,30 +44,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.4042-beta" />
+		<PackageReference Include="Lib.Harmony" Version="2.3.2.0" />
 		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Reference Include="0Harmony">
-	    <HintPath>..\Current\Assemblies\0Harmony.dll</HintPath>
-	    <Private>False</Private>
-	  </Reference>
-	  <Reference Include="Assembly-CSharp">
-	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
-	    <Private>False</Private>
-	  </Reference>
-	  <Reference Include="UnityEngine.CoreModule">
-	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-	    <Private>False</Private>
-	  </Reference>
-	  <Reference Include="UnityEngine.IMGUIModule">
-	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-	    <Private>False</Private>
-	  </Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuildAction" AfterTargets="Build">
@@ -76,12 +59,14 @@
 	</Target>
 
 	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
+		<Copy SourceFiles="bin\0Harmony.dll" DestinationFiles="..\Current\Assemblies\0Harmony.dll" />
 		<Copy SourceFiles="bin\HarmonyMod.dll" DestinationFiles="..\Current\Assemblies\HarmonyMod.dll" />
 		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<ItemGroup>
 			<CopyAbout Include="..\About\**" />
 			<Copy14 Include="..\1.4\**" />
 			<CopyCurrent Include="..\Current\**" />
+			<CopyTextures Include="..\Textures\**" />
 			<CopyLicense Include="..\LICENSE" />
 			<CopyLoadFolders Include="..\LoadFolders.xml" />
 			<CopyReadme Include="..\Readme.md" />
@@ -89,6 +74,7 @@
 		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
 		<Copy SourceFiles="@(Copy14)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.4\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyCurrent)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Current\%(RecursiveDir)" />
+		<Copy SourceFiles="@(CopyTextures)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Textures\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
