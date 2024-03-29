@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -30,6 +31,8 @@ namespace HarmonyMod
 		static readonly MethodInfo m_GetAotId = AccessTools.Method(typeof(StackTrace), "GetAotId");
 		static readonly GetAotId getAotId = AccessTools.MethodDelegate<GetAotId>(m_GetAotId);
 
+		public static readonly ConcurrentBag<int> seenStacktraces = [];
+
 		public static string ExtractHarmonyEnhancedStackTrace()
 		{
 			try
@@ -55,7 +58,12 @@ namespace HarmonyMod
 				}
 			}
 			_ = sb.AddHarmonyFrames(trace);
-			return sb.ToString();
+			var stacktrace = sb.ToString();
+			var hash = stacktrace.GetHashCode();
+			if (seenStacktraces.Contains(hash))
+				return $"Duplicate stacktrace, see [Ref {hash:X}] for original";
+			seenStacktraces.Add(hash);
+			return $"{stacktrace}\n[Ref {hash:X}]";
 		}
 
 		static bool AddHarmonyFrames(this StringBuilder sb, StackTrace trace)

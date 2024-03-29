@@ -66,7 +66,6 @@
 			<CopyAbout Include="..\About\**" />
 			<Copy14 Include="..\1.4\**" />
 			<CopyCurrent Include="..\Current\**" />
-			<CopyTextures Include="..\Textures\**" />
 			<CopyLicense Include="..\LICENSE" />
 			<CopyLoadFolders Include="..\LoadFolders.xml" />
 			<CopyReadme Include="..\Readme.md" />
@@ -74,7 +73,6 @@
 		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
 		<Copy SourceFiles="@(Copy14)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.4\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyCurrent)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Current\%(RecursiveDir)" />
-		<Copy SourceFiles="@(CopyTextures)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Textures\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />

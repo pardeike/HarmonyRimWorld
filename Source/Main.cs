@@ -1,9 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using UnityEngine;
 using Verse;
 
@@ -35,25 +33,6 @@ namespace HarmonyMod
 		}
 	}
 
-	[HarmonyPriority(Priority.Last)]
-	public static class Log_Patch
-	{
-		public static IEnumerable<MethodBase> TargetMethods()
-		{
-			yield return SymbolExtensions.GetMethodInfo(() => Log.Message(""));
-			yield return SymbolExtensions.GetMethodInfo(() => Log.Warning(""));
-			yield return SymbolExtensions.GetMethodInfo(() => Log.Error(""));
-		}
-
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			return instructions.MethodReplacer(
-				SymbolExtensions.GetMethodInfo(() => StackTraceUtility.ExtractStackTrace()),
-				SymbolExtensions.GetMethodInfo(() => ExceptionTools.ExtractHarmonyEnhancedStackTrace())
-			);
-		}
-	}
-
 	[HarmonyPatch(typeof(Environment), "GetStackTrace")]
 	public static class Environment_GetStackTrace_Patch
 	{
@@ -70,5 +49,11 @@ namespace HarmonyMod
 				return true;
 			}
 		}
+	}
+
+	[HarmonyPatch(typeof(Log), nameof(Log.ResetMessageCount))]
+	public static class Log_ResetMessageCount_Patch
+	{
+		public static void Postfix() => ExceptionTools.seenStacktraces.Clear();
 	}
 }
