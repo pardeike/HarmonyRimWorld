@@ -41,7 +41,7 @@ namespace HarmonyMod
 			try
 			{
 				var stackTrace = e == null ? new StackTrace(needFileInfo) : new StackTrace(e, needFileInfo);
-				__result = ExceptionTools.ExtractHarmonyEnhancedStackTrace(stackTrace);
+				__result = ExceptionTools.ExtractHarmonyEnhancedStackTrace(stackTrace, false, out _);
 				return false;
 			}
 			catch (Exception)
