@@ -61,9 +61,9 @@ namespace HarmonyMod
 			var stacktrace = sb.ToString();
 			var hash = stacktrace.GetHashCode();
 			if (seenStacktraces.Contains(hash))
-				return $"Duplicate stacktrace, see [Ref {hash:X}] for original";
+				return $"[Ref {hash:X}] Duplicate stacktrace, see ref for original";
 			seenStacktraces.Add(hash);
-			return $"{stacktrace}\n[Ref {hash:X}]";
+			return $"[Ref {hash:X}]\n{stacktrace}";
 		}
 
 		static bool AddHarmonyFrames(this StringBuilder sb, StackTrace trace)
