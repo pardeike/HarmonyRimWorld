@@ -5,12 +5,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using LudeonTK;
 using UnityEngine;
+using JetBrains.Annotations;
 
 namespace HarmonyMod
 {
 	public static class ExceptionTools
 	{
+		[TweakValue("_Harmony")]
+		[UsedImplicitly]
+		public static bool DisableStackTraceCaching;
+
 		public static readonly AccessTools.FieldRef<StackTrace, StackTrace[]> captured_traces = AccessTools.FieldRefAccess<StackTrace, StackTrace[]>("captured_traces");
 		public static readonly AccessTools.FieldRef<StackFrame, string> internalMethodName = AccessTools.FieldRefAccess<StackFrame, string>("internalMethodName");
 		public static readonly AccessTools.FieldRef<StackFrame, long> methodAddress = AccessTools.FieldRefAccess<StackFrame, long>("methodAddress");
@@ -56,6 +62,8 @@ namespace HarmonyMod
 			_ = sb.AddHarmonyFrames(trace);
 			var stacktrace = sb.ToString();
 			hash = stacktrace.GetHashCode();
+			if (DisableStackTraceCaching)
+				return stacktrace;
 			var hashRef = $"[Ref {hash:X}]";
 			if (forceRefresh)
 				return $"{hashRef}\n{stacktrace}";
