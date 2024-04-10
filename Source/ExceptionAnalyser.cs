@@ -5,53 +5,34 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using LudeonTK;
-using UnityEngine;
-using JetBrains.Annotations;
 
 namespace HarmonyMod
 {
-	public static class ExceptionTools
+	static class ExceptionTools
 	{
-		[TweakValue("_Harmony")]
-		[UsedImplicitly]
-		public static bool DisableStackTraceCaching;
+		static readonly AccessTools.FieldRef<StackTrace, StackTrace[]> captured_traces = AccessTools.FieldRefAccess<StackTrace, StackTrace[]>("captured_traces");
+		static readonly AccessTools.FieldRef<StackFrame, string> internalMethodName = AccessTools.FieldRefAccess<StackFrame, string>("internalMethodName");
+		static readonly AccessTools.FieldRef<StackFrame, long> methodAddress = AccessTools.FieldRefAccess<StackFrame, long>("methodAddress");
 
-		public static readonly AccessTools.FieldRef<StackTrace, StackTrace[]> captured_traces = AccessTools.FieldRefAccess<StackTrace, StackTrace[]>("captured_traces");
-		public static readonly AccessTools.FieldRef<StackFrame, string> internalMethodName = AccessTools.FieldRefAccess<StackFrame, string>("internalMethodName");
-		public static readonly AccessTools.FieldRef<StackFrame, long> methodAddress = AccessTools.FieldRefAccess<StackFrame, long>("methodAddress");
+		delegate void GetFullNameForStackTraceDelegate(StackTrace instance, StringBuilder sb, MethodBase mi);
+		static readonly MethodInfo m_GetFullNameForStackTrace = AccessTools.Method(typeof(StackTrace), "GetFullNameForStackTrace");
+		static readonly GetFullNameForStackTraceDelegate GetFullNameForStackTrace = AccessTools.MethodDelegate<GetFullNameForStackTraceDelegate>(m_GetFullNameForStackTrace);
 
-		public delegate void GetFullNameForStackTraceDelegate(StackTrace instance, StringBuilder sb, MethodBase mi);
-		private static readonly MethodInfo m_GetFullNameForStackTrace = AccessTools.Method(typeof(StackTrace), "GetFullNameForStackTrace");
-		public static readonly GetFullNameForStackTraceDelegate GetFullNameForStackTrace = AccessTools.MethodDelegate<GetFullNameForStackTraceDelegate>(m_GetFullNameForStackTrace);
+		delegate uint GetMethodIndexDelegate(StackFrame instance);
+		static readonly MethodInfo m_GetMethodIndex = AccessTools.Method(typeof(StackFrame), "GetMethodIndex");
+		static readonly GetMethodIndexDelegate GetMethodIndex = AccessTools.MethodDelegate<GetMethodIndexDelegate>(m_GetMethodIndex);
 
-		public delegate uint GetMethodIndexDelegate(StackFrame instance);
-		private static readonly MethodInfo m_GetMethodIndex = AccessTools.Method(typeof(StackFrame), "GetMethodIndex");
-		public static readonly GetMethodIndexDelegate GetMethodIndex = AccessTools.MethodDelegate<GetMethodIndexDelegate>(m_GetMethodIndex);
+		delegate string GetSecureFileNameDelegate(StackFrame instance);
+		static readonly MethodInfo m_GetSecureFileName = AccessTools.Method(typeof(StackFrame), "GetSecureFileName");
+		static readonly GetSecureFileNameDelegate GetSecureFileName = AccessTools.MethodDelegate<GetSecureFileNameDelegate>(m_GetSecureFileName);
 
-		public delegate string GetSecureFileNameDelegate(StackFrame instance);
-		private static readonly MethodInfo m_GetSecureFileName = AccessTools.Method(typeof(StackFrame), "GetSecureFileName");
-		public static readonly GetSecureFileNameDelegate GetSecureFileName = AccessTools.MethodDelegate<GetSecureFileNameDelegate>(m_GetSecureFileName);
+		delegate string GetAotIdDelegate();
+		static readonly MethodInfo m_GetAotId = AccessTools.Method(typeof(StackTrace), "GetAotId");
+		static readonly GetAotIdDelegate GetAotId = AccessTools.MethodDelegate<GetAotIdDelegate>(m_GetAotId);
 
-		public delegate string GetAotIdDelegate();
-		private static readonly MethodInfo m_GetAotId = AccessTools.Method(typeof(StackTrace), "GetAotId");
-		public static readonly GetAotIdDelegate GetAotId = AccessTools.MethodDelegate<GetAotIdDelegate>(m_GetAotId);
+		internal static readonly ConcurrentDictionary<int, int> seenStacktraces = [];
 
-		public static readonly ConcurrentDictionary<int, int> seenStacktraces = [];
-
-		public static string ExtractHarmonyEnhancedStackTrace()
-		{
-			try
-			{
-				return ExtractHarmonyEnhancedStackTrace(new StackTrace(3, true), false, out _);
-			}
-			catch (System.Exception)
-			{
-				return StackTraceUtility.ExtractStackTrace();
-			}
-		}
-
-		public static string ExtractHarmonyEnhancedStackTrace(StackTrace trace, bool forceRefresh, out int hash)
+		internal static string ExtractHarmonyEnhancedStackTrace(StackTrace trace, bool forceRefresh, out int hash)
 		{
 			var sb = new StringBuilder();
 			var traces = captured_traces(trace);
@@ -62,7 +43,7 @@ namespace HarmonyMod
 			_ = sb.AddHarmonyFrames(trace);
 			var stacktrace = sb.ToString();
 			hash = stacktrace.GetHashCode();
-			if (DisableStackTraceCaching)
+			if (HarmonyMain.noStacktraceCaching)
 				return stacktrace;
 			var hashRef = $"[Ref {hash:X}]";
 			if (forceRefresh)
@@ -73,7 +54,7 @@ namespace HarmonyMod
 			return $"{hashRef}\n{stacktrace}";
 		}
 
-		public static bool AddHarmonyFrames(this StringBuilder sb, StackTrace trace)
+		static bool AddHarmonyFrames(this StringBuilder sb, StackTrace trace)
 		{
 			if (trace.FrameCount == 0)
 				return false;
@@ -131,7 +112,7 @@ namespace HarmonyMod
 			return true;
 		}
 
-		public static void AppendPatch(this StringBuilder sb, MethodBase method, IEnumerable<Patch> fixes, string name)
+		static void AppendPatch(this StringBuilder sb, MethodBase method, IEnumerable<Patch> fixes, string name)
 		{
 			foreach (var patch in PatchProcessor.GetSortedPatchMethods(method, fixes.ToArray()))
 			{
