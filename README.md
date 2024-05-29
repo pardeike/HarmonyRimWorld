@@ -22,4 +22,6 @@ which will make RimWorld 1.1 force the user to install this mod. It will automat
 
 Whenever Harmony needs updating, this mod will update too. Unless it is a breaking change (we will avoid making those). In which case, a second Harmony mod will be created so users can use either this one or the new one.
 
-/Andreas "Brrainz" Pardeike
+**Note:** Adding **HARMONY_NO_LOG** (any non-empty value will do) to your environment variables will suppress the creation of the `harmony.log.txt` file that is created if some mod author forgets to remove debugging before releasing their mod. See also [How to edit environment variables](https://www.howtogeek.com/787217/how-to-edit-environment-variables-on-windows-10-or-11/).
+
+/Brrainz
