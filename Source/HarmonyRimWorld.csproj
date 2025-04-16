@@ -44,8 +44,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.4060-beta" />
-		<PackageReference Include="Lib.Harmony" Version="2.3.3" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.4409" />
+		<PackageReference Include="Lib.Harmony" Version="2.3.6" />
 		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
 			<PrivateAssets>all</PrivateAssets>
