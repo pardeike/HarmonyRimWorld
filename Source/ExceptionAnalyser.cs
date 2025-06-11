@@ -1,34 +1,48 @@
 ﻿using HarmonyLib;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Verse;
 
 namespace HarmonyMod
 {
 	static class ExceptionTools
 	{
+		static bool hasDelegateError = false;
+		static T GetDelegate<T>(Type type, string name) where T : Delegate
+		{
+			try
+			{
+				var method = AccessTools.Method(type, name);
+				return AccessTools.MethodDelegate<T>(method);
+			}
+			catch (Exception ex)
+			{
+				Log.Error($"Harmony: Failed to create delegate for {type}.{name}: {ex.Message}");
+				hasDelegateError = true;
+				return null;
+			}
+		}
+
 		static readonly AccessTools.FieldRef<StackTrace, StackTrace[]> captured_traces = AccessTools.FieldRefAccess<StackTrace, StackTrace[]>("captured_traces");
 		static readonly AccessTools.FieldRef<StackFrame, string> internalMethodName = AccessTools.FieldRefAccess<StackFrame, string>("internalMethodName");
 		static readonly AccessTools.FieldRef<StackFrame, long> methodAddress = AccessTools.FieldRefAccess<StackFrame, long>("methodAddress");
 
-		delegate void GetFullNameForStackTraceDelegate(StackTrace instance, StringBuilder sb, MethodBase mi);
-		static readonly MethodInfo m_GetFullNameForStackTrace = AccessTools.Method(typeof(StackTrace), "GetFullNameForStackTrace");
-		static readonly GetFullNameForStackTraceDelegate GetFullNameForStackTrace = AccessTools.MethodDelegate<GetFullNameForStackTraceDelegate>(m_GetFullNameForStackTrace);
+		delegate void GetFullNameForStackTraceDelegate(StackTrace instance, StringBuilder sb, MethodBase mi, bool needsNewLine, out bool skipped, out bool isAsync);
+		static readonly GetFullNameForStackTraceDelegate GetFullNameForStackTrace = GetDelegate<GetFullNameForStackTraceDelegate>(typeof(StackTrace), "GetFullNameForStackTrace");
 
 		delegate uint GetMethodIndexDelegate(StackFrame instance);
-		static readonly MethodInfo m_GetMethodIndex = AccessTools.Method(typeof(StackFrame), "GetMethodIndex");
-		static readonly GetMethodIndexDelegate GetMethodIndex = AccessTools.MethodDelegate<GetMethodIndexDelegate>(m_GetMethodIndex);
+		static readonly GetMethodIndexDelegate GetMethodIndex = GetDelegate<GetMethodIndexDelegate>(typeof(StackFrame), "GetMethodIndex");
 
 		delegate string GetSecureFileNameDelegate(StackFrame instance);
-		static readonly MethodInfo m_GetSecureFileName = AccessTools.Method(typeof(StackFrame), "GetSecureFileName");
-		static readonly GetSecureFileNameDelegate GetSecureFileName = AccessTools.MethodDelegate<GetSecureFileNameDelegate>(m_GetSecureFileName);
+		static readonly GetSecureFileNameDelegate GetSecureFileName = GetDelegate<GetSecureFileNameDelegate>(typeof(StackFrame), "GetSecureFileName");
 
 		delegate string GetAotIdDelegate();
-		static readonly MethodInfo m_GetAotId = AccessTools.Method(typeof(StackTrace), "GetAotId");
-		static readonly GetAotIdDelegate GetAotId = AccessTools.MethodDelegate<GetAotIdDelegate>(m_GetAotId);
+		static readonly GetAotIdDelegate GetAotId = GetDelegate<GetAotIdDelegate>(typeof(StackTrace), "GetAotId");
 
 		internal static readonly ConcurrentDictionary<int, int> seenStacktraces = [];
 
@@ -64,10 +78,10 @@ namespace HarmonyMod
 				var frame = trace.GetFrame(i);
 				if (i > 0)
 					_ = sb.Append('\n');
-				_ = sb.Append(" at ");
+				//_ = sb.Append(" at ");
 
 				var method = Harmony.GetOriginalMethodFromStackframe(frame);
-				if (method == null)
+				if (method == null || hasDelegateError)
 				{
 					var internalMethodName = ExceptionTools.internalMethodName(frame);
 					if (internalMethodName != null)
@@ -77,7 +91,7 @@ namespace HarmonyMod
 				}
 				else
 				{
-					GetFullNameForStackTrace(trace, sb, method);
+					GetFullNameForStackTrace(trace, sb, method, false, out _, out _);
 					if (frame.GetILOffset() == -1)
 					{
 						_ = sb.AppendFormat(" <0x{0:x5} + 0x{1:x5}>", methodAddress(frame), frame.GetNativeOffset());
@@ -114,11 +128,11 @@ namespace HarmonyMod
 
 		static void AppendPatch(this StringBuilder sb, MethodBase method, IEnumerable<Patch> fixes, string name)
 		{
-			foreach (var patch in PatchProcessor.GetSortedPatchMethods(method, fixes.ToArray()))
+			foreach (var patch in PatchProcessor.GetSortedPatchMethods(method, [.. fixes]))
 			{
 				var owner = fixes.First(p => p.PatchMethod == patch).owner;
 				var parameters = patch.GetParameters().Join(p => $"{p.ParameterType.Name} {p.Name}");
-				_ = sb.AppendFormat("\n     - {0} {1}: {2} {3}:{4}({5})", name, owner, patch.ReturnType.Name, patch.DeclaringType.FullName, patch.Name, parameters);
+				_ = sb.AppendFormat("\n    - {0} {1}: {2} {3}:{4}({5})", name, owner, patch.ReturnType.Name, patch.DeclaringType.FullName, patch.Name, parameters);
 			}
 		}
 	}
