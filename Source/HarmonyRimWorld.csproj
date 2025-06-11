@@ -65,6 +65,7 @@
 		<ItemGroup>
 			<CopyAbout Include="..\About\**" />
 			<Copy14 Include="..\1.4\**" />
+			<Copy15 Include="..\1.5\**" />
 			<CopyCurrent Include="..\Current\**" />
 			<CopyLicense Include="..\LICENSE" />
 			<CopyLoadFolders Include="..\LoadFolders.xml" />
@@ -72,6 +73,7 @@
 		</ItemGroup>
 		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
 		<Copy SourceFiles="@(Copy14)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.4\%(RecursiveDir)" />
+		<Copy SourceFiles="@(Copy15)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.5\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyCurrent)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Current\%(RecursiveDir)" />
 		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
 		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
