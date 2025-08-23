@@ -1,82 +1,93 @@
 ﻿using HarmonyLib;
 using LudeonTK;
-using RimWorld;
 using System;
-using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using System.Text.RegularExpressions;
 using Verse;
 
-namespace HarmonyMod
+namespace HarmonyMod;
+
+[StaticConstructorOnStartup]
+public class HarmonyMain(ModContentPack content) : Mod(content)
 {
-	[StaticConstructorOnStartup]
-	public class HarmonyMain(ModContentPack content) : Mod(content)
+	[TweakValue("Harmony")] public static bool noStacktraceCaching;
+	[TweakValue("Harmony")] public static bool noStacktraceEnhancing;
+
+	public static Version loadedHarmonyVersion = default;
+	public static string loadingError;
+
+	public static string modVersion = ((AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(
+		 Assembly.GetExecutingAssembly(),
+		 typeof(AssemblyFileVersionAttribute), false)
+	).Version;
+
+	static HarmonyMain()
 	{
-		[TweakValue("Harmony")]
-		public static bool noStacktraceCaching;
-		[TweakValue("Harmony")]
-		public static bool noStacktraceEnhancing;
-
-		public static Version harmonyVersion = default;
-
-		public static string modVersion = ((AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(
-			 Assembly.GetExecutingAssembly(),
-			 typeof(AssemblyFileVersionAttribute), false)
-		).Version;
-
-		static HarmonyMain()
+		string[] HarmonyNames = ["0Harmony", "Lib.Harmony", "HarmonyLib"];
+		var loaded = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => HarmonyNames.Contains(a.GetName().Name));
+		if (loaded != null)
 		{
-			_ = Harmony.VersionInfo(out harmonyVersion);
+			loadedHarmonyVersion = loaded.GetName().Version ?? new Version(0, 0, 0, 0);
+
+			var loadedPath = SafeLocation(loaded);
+			var ourPath = SafeLocation(Assembly.GetExecutingAssembly());
+			var expectedPath = ourPath[..(ourPath.LastIndexOfAny(['\\', '/']) + 1)] + "0Harmony.dll";
+
+			var ourHarmonyVersion = new Version(0, 0, 0, 0);
+			try
+			{
+				if (System.IO.File.Exists(expectedPath))
+				{
+					var assemblyName = AssemblyName.GetAssemblyName(expectedPath);
+					ourHarmonyVersion = assemblyName.Version ?? new Version(0, 0, 0, 0);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Warning($"Could not read version of our 0Harmony.dll from disk: {ex.Message}");
+			}
+
+			if (expectedPath != loadedPath && ourHarmonyVersion > loadedHarmonyVersion)
+			{
+				loadingError = "HARMONY LOADING PROBLEM\n\nAnother Harmony library was loaded before the Harmony mod could.\n\n" 
+					+ $"Their version: {loadedHarmonyVersion}\nOur version: {ourHarmonyVersion}\n\n"
+					+ $"This means that your Harmony version is now downgraded to {loadedHarmonyVersion} regardless of what the Harmony mod provides. " 
+					+ $"You need to update or remove that other loader/mod. The other Harmony was loaded from: {loadedPath}";
+				if (Regex.IsMatch(loadedPath, @"data-[0-9A-F]{16}"))
+					loadingError += "\n\nThe path looks like Harmony was loaded from memory and not via a file path. This often hints to preloaders like Doorstop or similar.";
+				Log.Error(loadingError);
+			}
+		}
+
+		try
+		{
 			var harmony = new Harmony("net.pardeike.rimworld.lib.harmony");
 			harmony.PatchAll();
 		}
-	}
-
-	[HarmonyPatch(typeof(VersionControl), nameof(VersionControl.DrawInfoInCorner))]
-	static class VersionControl_DrawInfoInCorner_Patch
-	{
-		static void Postfix()
+		catch (Exception ex)
 		{
-			var str = $"Harmony v{HarmonyMain.harmonyVersion}";
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white.ToTransparent(0.5f);
-			var size = Text.CalcSize(str);
-			var rect = new Rect(10f, 58f, size.x, size.y);
-			Widgets.Label(rect, str);
-			GUI.color = Color.white;
-			if (Mouse.IsOver(rect))
-			{
-				var tipSignal = new TipSignal($"Harmony Mod v{HarmonyMain.modVersion}");
-				TooltipHandler.TipRegion(rect, tipSignal);
-				Widgets.DrawHighlight(rect);
-			}
+			Log.Error($"Lib.Harmony could not be initialized: {ex.Message}");
 		}
 	}
 
-	[HarmonyPatch(typeof(Environment), "GetStackTrace")]
-	static class Environment_GetStackTrace_Patch
+	static string SafeLocation(Assembly a)
 	{
-		static bool Prefix(Exception e, bool needFileInfo, ref string __result)
+		try
 		{
-			if (HarmonyMain.noStacktraceEnhancing)
-				return true;
-
-			try
-			{
-				var stackTrace = e == null ? new StackTrace(needFileInfo) : new StackTrace(e, needFileInfo);
-				__result = ExceptionTools.ExtractHarmonyEnhancedStackTrace(stackTrace, false, out _);
-				return false;
-			}
-			catch (Exception)
-			{
-				return true;
-			}
+			if (!string.IsNullOrEmpty(a.Location))
+				return a.Location;
 		}
-	}
+		catch { }
 
-	[HarmonyPatch(typeof(Log), nameof(Log.ResetMessageCount))]
-	static class Log_ResetMessageCount_Patch
-	{
-		static void Postfix() => ExceptionTools.seenStacktraces.Clear();
+		try
+		{
+			var cb = a.GetName().CodeBase;
+			if (!string.IsNullOrEmpty(cb) && Uri.TryCreate(cb, UriKind.Absolute, out var uri) && uri.IsFile)
+				return uri.LocalPath;
+		}
+		catch { }
+
+		return string.Empty;
 	}
 }
