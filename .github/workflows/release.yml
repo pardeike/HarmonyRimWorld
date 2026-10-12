@@ -1,0 +1,51 @@
+name: Release Harmony Mod
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release tag, for example v3.0.0.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: harmony-mod-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify and package the tracked release payload
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: >-
+          python3 -I scripts/mod-package.py
+          --manifest Release-payload.json
+          --expected-version "$RELEASE_TAG"
+          --output dist/HarmonyMod.zip
+      - name: Publish the verified release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          sha256sum dist/HarmonyMod.zip > dist/HarmonyMod.zip.sha256
+          gh release create "$RELEASE_TAG" --verify-tag --latest \
+            --title "Harmony Mod $RELEASE_TAG" --notes-file RELEASE_NOTES.md \
+            dist/HarmonyMod.zip dist/HarmonyMod.zip.sha256
+          gh release download "$RELEASE_TAG" --pattern HarmonyMod.zip --dir .build/readback
+          cmp dist/HarmonyMod.zip .build/readback/HarmonyMod.zip
+      - name: Update the latest reference
+        run: |
+          git tag --force latest HEAD
+          git push origin refs/tags/latest --force

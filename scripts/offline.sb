@@ -1,0 +1,6 @@
+(version 1)
+(allow default)
+; Deny direct network access for this process and inherited child processes.
+(deny network*)
+; Prevent Apple Events from asking another application to act on our behalf.
+(deny appleevent-send)

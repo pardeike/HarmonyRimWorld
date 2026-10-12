@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "Lib.Harmony": {
+        "type": "Direct",
+        "requested": "[3.*-*, )",
+        "resolved": "3.0.0-rc.2",
+        "contentHash": "lyxdPUBZdCD6lS7xNlf0JcQmMMGrQw+IpOIMvDwE1G/MHzVcbkFgYk6ydBhDSgErCgdhxM46szzHzjED4ptviA=="
+      }
+    }
+  }
+}

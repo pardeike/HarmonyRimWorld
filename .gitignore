@@ -241,3 +241,9 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+# Local build and review outputs
+.build/
+dist/
+.runs/
+.codex/
+__pycache__/

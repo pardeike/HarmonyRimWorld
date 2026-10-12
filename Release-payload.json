@@ -1,0 +1,21 @@
+{
+  "version": "3.0.0.0",
+  "payloadSha256": {
+    "LoadFolders.xml": "6ae7226bac3423c9d3e3ce6900cffb02716abfe57ff9956e4327f515a49c05d7",
+    "LICENSE": "a5883d0c45eb7e176d3d1631220e7f96e958e37064773d40245ae6db560bbd6d",
+    "README.md": "8134d9036eec616770b5b806865a4fd8c6307c96da88594c1d4154485f688376",
+    "About/About.xml": "951d14e6ad0c019d5ab9e2f245d981185fcbb3b552bcb07eeb6b8f7237b24042",
+    "About/Manifest.xml": "b056dbd4c13be4409214fd02504ffa93d7a3e599c7466a88d08833bb087fa8d9",
+    "About/ModIcon.png": "20786cac048c1d625d070b97cbe4b826e5d9237c8abbb69e2551669fddf33ace",
+    "About/Preview.png": "223bd3cef2779e807d00701d11335780dd1a61e4e719815abcad436c3ec04492",
+    "About/PublishedFileId.txt": "5e2bc5fff1578aa20db230f1c6af7ee31ee2cd4cb3093c6a20d584ad7e7ee9a7",
+    "1.4/Assemblies/0Harmony.dll": "d04ec5b2590dd1bbb57f0f11dc417b1a5bebbb36b1f97006d35f2d87c3a2a69f",
+    "1.4/Assemblies/HarmonyMod.dll": "f85da924641422a297ce5f2f4b81c0e68363dfe8ab7a951b0eabe25982e5a13e",
+    "1.5/Assemblies/0Harmony.dll": "e96fc01100b6bbdc094b900efe47850cf97aa9df7c6a78cbe723b1decf5a506a",
+    "1.5/Assemblies/HarmonyMod.dll": "4bf6174e5f80cb1866a791cabaeb463f2e6b31e61e703e6676fcaf6030add625",
+    "1.6/Assemblies/0Harmony.dll": "8ac54fdf0fab257148d68bc744d67609b74554ee72a4f3452e32030eaad009c6",
+    "1.6/Assemblies/HarmonyMod.dll": "408c2cd72b45da8c70c0c538b2b346c8dcbb5bded066373f6a3eb8b26615a2e7",
+    "1.7/Assemblies/0Harmony.dll": "94dd929a06f720869f6a718a64bc6713a37dbe153c2f4c16c031b2587d7ee694",
+    "1.7/Assemblies/HarmonyMod.dll": "30224acb684080847c4b3a9ebaeffc6a61b49b98149b36b8e4834cdc6887dfda"
+  }
+}

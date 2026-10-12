@@ -1,0 +1,18 @@
+{
+  "harmony16OfficialVersion": "2.4.3",
+  "harmony16Sha256": "8ac54fdf0fab257148d68bc744d67609b74554ee72a4f3452e32030eaad009c6",
+  "preservedLegacyFiles": {
+    "1.4/Assemblies/HarmonyMod.dll": "f85da924641422a297ce5f2f4b81c0e68363dfe8ab7a951b0eabe25982e5a13e",
+    "1.4/Assemblies/0Harmony.dll": "d04ec5b2590dd1bbb57f0f11dc417b1a5bebbb36b1f97006d35f2d87c3a2a69f",
+    "1.5/Assemblies/HarmonyMod.dll": "4bf6174e5f80cb1866a791cabaeb463f2e6b31e61e703e6676fcaf6030add625",
+    "1.5/Assemblies/0Harmony.dll": "e96fc01100b6bbdc094b900efe47850cf97aa9df7c6a78cbe723b1decf5a506a",
+    "1.6/Assemblies/HarmonyMod.dll": "408c2cd72b45da8c70c0c538b2b346c8dcbb5bded066373f6a3eb8b26615a2e7",
+    "1.6/Assemblies/0Harmony.dll": "8ac54fdf0fab257148d68bc744d67609b74554ee72a4f3452e32030eaad009c6"
+  },
+  "officialModReleaseTag": "v2.4.2.0",
+  "official16WrapperSha256": "408c2cd72b45da8c70c0c538b2b346c8dcbb5bded066373f6a3eb8b26615a2e7",
+  "harmony16PackageId": "Lib.Harmony",
+  "harmony16PackageAsset": "lib/net472/0Harmony.dll",
+  "harmony16PackageSha256": "f07af11a0d62447e7e1b6e3fcf1e28fc75d9f8d1abf2d6ee79aabcdc4db43e88",
+  "harmony16ReportedSourceCommit": "b79f2f1ac971e5bc224cda3efedbbb4084efbfb6"
+}

@@ -3,9 +3,16 @@
 	<PropertyGroup>
 		<ModName>HarmonyMod</ModName>
 		<ModFileName>HarmonyMod</ModFileName>
-		<Repository>https://github.com/pardeike/HarmonyRimworld</Repository>
-		<ModVersion>2.4.2.0</ModVersion>
-		<HarmonyLibVersion>2.4.1.0</HarmonyLibVersion>
+		<NuGetAudit>false</NuGetAudit>
+		<EnableSourceLink>false</EnableSourceLink>
+		<EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+		<EmbedUntrackedSources>false</EmbedUntrackedSources>
+		<ModVersion>3.0.0.0</ModVersion>
+		<ModInformationalVersion>$(ModVersion)</ModInformationalVersion>
+		<ActiveRimWorldVersion>1.7</ActiveRimWorldVersion>
+		<!-- Include prereleases, but stay on Harmony 3. NuGet chooses the TFM asset. -->
+		<HarmonyLibVersion Condition="'$(HarmonyLibVersion)' == ''">3.*-*</HarmonyLibVersion>
+		<RimWorldAssemblyDir Condition="'$(RimWorldAssemblyDir)' == ''">$(HOME)/Library/Application Support/Steam/steamapps/common/RimWorld/RimWorld.app/Contents/MacOS</RimWorldAssemblyDir>
 		<ProjectGuid>{C0C9BB35-9100-47A8-886E-32932EF301ED}</ProjectGuid>
 	</PropertyGroup>
 

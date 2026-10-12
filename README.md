@@ -1,42 +1,26 @@
-# RimWorld Harmony Library Mod
+# Harmony Mod
 
-This mod brings the Harmony library into RimWorld modding.
+Harmony provides runtime patching support for RimWorld mods. Enable it above
+Core and mods that depend on Harmony.
 
-![Harmony](https://raw.githubusercontent.com/pardeike/Harmony/master/HarmonyLogo.png)  
-GitHub Repository: [Harmony](https://github.com/pardeike/Harmony)
+RimWorld 1.7 uses Harmony 3 for .NET 10. RimWorld 1.6 uses official Harmony 2.4.3
+for .NET Framework 4.7.2 with the unchanged released mod wrapper. The 1.4 and
+1.5 assemblies are preserved.
 
-Instead of including `0Harmony.dll` in your `Assemblies` folder, you use the Harmony reference from nuget: **Lib.Harmony.Ref**. Then, you add the following to your `About.xml` file:
+Extract the `HarmonyMod` folder into the game's `Mods` directory. Enable only
+one copy of the Harmony mod.
 
-```
-<modDependencies>
-    <li>
-        <packageId>brrainz.harmony</packageId>
-        <displayName>Harmony</displayName>
-        <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-        <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
-    </li>
-</modDependencies>
-```
+The Mods list and corner label show the mod's release version.
+Hover the label to see the loaded Harmony library version as well. Include both
+versions in bug reports.
 
-which will make RimWorld force the user to install this mod. It will automatically want to be installed high up in the list which makes it supply `HarmonyLib` to all mods below. This means that all mods will use **the same Harmony version**.
+Stacktrace enhancement preserves the original trace and adds Harmony patch
+owners. Reference IDs identify matching traces; every occurrence retains its
+full trace. The enhancement and reference-caching settings remain available.
 
-Whenever Harmony needs updating, this mod will update too.
+In RimWorld 1.7, the default `harmony.log.txt` is stored beside `Player.log` in
+the game's log directory. Set `HARMONY_LOG_FILE` before the first Harmony log
+access to choose another location; `HARMONY_NO_LOG` and custom log writers
+remain supported.
 
-**Notes**
-
-Adding **HARMONY_NO_LOG** (any non-empty value will do) to your environment variables will suppress the creation of the `harmony.log.txt` file that is created if some mod author forgets to remove debugging before releasing their mod. See also [How to edit environment variables](https://www.howtogeek.com/787217/how-to-edit-environment-variables-on-windows-10-or-11/).
-
-If you want to turn off the enhancement of stacktraces, you can edit the tweak values of RimWorld (use Debug mode, then the second debug icon from the left) and check the following tweak variables:
-
-<img width="820" height="60" alt="image" src="https://github.com/user-attachments/assets/322f0b9f-0bdc-4aa7-8796-603195275865" />
-
----
-
-**Support**
-
-Supporting me will help me to help the community. On [Patreon](https://patreon.com/pardeike) or on [GitHub](https://github.com/sponsors/pardeike).  
-Or simply star my GitHub repository (its free!): https://github.com/pardeike/Harmony
-
-ENJOY  
-/Brrainz
-
+See `BUILDING.md` in the source project for build instructions.

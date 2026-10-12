@@ -1,83 +1,64 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<RootNamespace>$(ModFileName)</RootNamespace>
-		<AssemblyName>$(ModFileName)</AssemblyName>
-		<TargetFramework>net472</TargetFramework>
-		<LangVersion>latest</LangVersion>
-		<PlatformTarget>x64</PlatformTarget>
-		<OutputPath>bin</OutputPath>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<Version>$(ModVersion)</Version>
-		<AssemblyVersion>$(ModVersion)</AssemblyVersion>
-		<FileVersion>$(ModVersion)</FileVersion>
-		<PackageVersion>$(ModVersion)</PackageVersion>
-		<InformationalVersion>$(ModVersion)</InformationalVersion>
-		<Company>Brrainz</Company>
-		<Authors>Andreas Pardeike</Authors>
-		<Copyright>Copyright Andreas Pardeike</Copyright>
-		<PackageProjectUrl>$(Repository)</PackageProjectUrl>
-		<RepositoryUrl>$(Repository)</RepositoryUrl>
-		<Product>$(ModName)</Product>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugSymbols>false</DebugSymbols>
-		<Optimize>true</Optimize>
-		<DebugType>none</DebugType>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DebugSymbols>true</DebugSymbols>
-		<DefineConstants>RW12;RW13;TRACE;DEBUG</DefineConstants>
-		<Optimize>false</Optimize>
-		<DebugType>portable</DebugType>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Content Include="..\Directory.Build.props">
-			<Link>%(Filename)%(Extension)</Link>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4543" />
-		<PackageReference Include="Lib.Harmony" Version="$(HarmonyLibVersion)" />
-		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
-		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<Target Name="PostBuildAction" AfterTargets="Build">
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\About.xml" Query="//ModMetaData/modVersion" Value="$(ModVersion)" />
-		<XmlPoke XmlInputPath="$(MSBuildProjectDirectory)\..\About\Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
-	</Target>
-
-	<Target Name="CopyToRimworld" AfterTargets="PostBuildAction" Condition="'$(RIMWORLD_MOD_DIR)' != ''">
-		<Copy SourceFiles="bin\0Harmony.dll" DestinationFiles="..\Current\Assemblies\0Harmony.dll" />
-		<Copy SourceFiles="bin\HarmonyMod.dll" DestinationFiles="..\Current\Assemblies\HarmonyMod.dll" />
-		<RemoveDir Directories="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-		<ItemGroup>
-			<CopyAbout Include="..\About\**" />
-			<Copy14 Include="..\1.4\**" />
-			<Copy15 Include="..\1.5\**" />
-			<CopyCurrent Include="..\Current\**" />
-			<CopyLicense Include="..\LICENSE" />
-			<CopyLoadFolders Include="..\LoadFolders.xml" />
-			<CopyReadme Include="..\README.md" />
-		</ItemGroup>
-		<Copy SourceFiles="@(CopyAbout)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\About\%(RecursiveDir)" />
-		<Copy SourceFiles="@(Copy14)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.4\%(RecursiveDir)" />
-		<Copy SourceFiles="@(Copy15)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\1.5\%(RecursiveDir)" />
-		<Copy SourceFiles="@(CopyCurrent)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)\Current\%(RecursiveDir)" />
-		<Copy SourceFiles="@(CopyLicense)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-		<Copy SourceFiles="@(CopyLoadFolders)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-		<Copy SourceFiles="@(CopyReadme)" DestinationFolder="$(RIMWORLD_MOD_DIR)\$(ModFileName)" />
-	</Target>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>$(ModFileName)</RootNamespace>
+    <AssemblyName>$(ModFileName)</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin/$(Configuration)</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion)</AssemblyVersion>
+    <FileVersion>$(ModVersion)</FileVersion>
+    <InformationalVersion>$(ModInformationalVersion)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Company>Brrainz</Company>
+    <Authors>Andreas Pardeike</Authors>
+    <Product>$(ModName)</Product>
+    <NuGetAudit>false</NuGetAudit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildProjectDirectory)=/_/Source</PathMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony" Version="$(HarmonyLibVersion)" GeneratePathProperty="true" PrivateAssets="all" />
+    <ProjectReference Include="../Tools/AssemblyMetadata/AssemblyMetadata.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(RimWorldAssemblyDir)/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityStubs">
+      <HintPath>$(RimWorldAssemblyDir)/UnityStubs.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Waylith">
+      <HintPath>$(RimWorldAssemblyDir)/Waylith.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="ValidateBuildInputs" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(ActiveRimWorldVersion)' != '1.7' or '$(TargetFramework)' != 'net10.0'" Text="This project builds only the .NET 10 / RimWorld 1.7 wrapper. The released legacy folders are frozen." />
+    <Error Condition="!Exists('$(PkgLib_Harmony)/lib/$(TargetFramework)/0Harmony.dll')" Text="The selected Lib.Harmony package must contain a native net10.0 asset. Run scripts/fetch-harmony.py if the package is missing." />
+    <Error Condition="!Exists('$(RimWorldAssemblyDir)/Assembly-CSharp.dll')" Text="Set RimWorldAssemblyDir to the installed game's assembly directory." />
+    <Exec LogStandardErrorAsError="true" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/mod-package.py&quot; --validate-legacy" />
+    <Exec LogStandardErrorAsError="true" Condition="'$(Configuration)' == 'Release' and '$(RIMWORLD_MOD_DIR)' != ''" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/mod-package.py&quot; --mods-dir &quot;$(RIMWORLD_MOD_DIR)&quot; --check" EnvironmentVariables="RIMWORLD_ASSEMBLY_DIR=$(RimWorldAssemblyDir)" />
+  </Target>
+  <Target Name="StageMod" AfterTargets="Build">
+    <MakeDir Directories="$(MSBuildProjectDirectory)/../$(ActiveRimWorldVersion)/Assemblies" />
+    <Exec LogStandardErrorAsError="true" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/stage-harmony.py&quot; --package-dir &quot;$(PkgLib_Harmony)&quot; --built-library &quot;$(TargetDir)0Harmony.dll&quot; --metadata-tool &quot;$(MSBuildProjectDirectory)/../Tools/AssemblyMetadata/bin/$(Configuration)/net10.0/AssemblyMetadata.dll&quot;" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)/../$(ActiveRimWorldVersion)/Assemblies" />
+    <XmlPoke XmlInputPath="$(MSBuildProjectDirectory)/../About/About.xml" Query="//ModMetaData/modVersion" Value="$(ModInformationalVersion)" />
+    <XmlPoke XmlInputPath="$(MSBuildProjectDirectory)/../About/Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
+  </Target>
+  <Target Name="CopyToRimworld" AfterTargets="StageMod" Condition="'$(Configuration)' == 'Release' and '$(RIMWORLD_MOD_DIR)' != ''">
+    <Exec LogStandardErrorAsError="true" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/mod-package.py&quot; --mods-dir &quot;$(RIMWORLD_MOD_DIR)&quot;" EnvironmentVariables="RIMWORLD_ASSEMBLY_DIR=$(RimWorldAssemblyDir)" />
+  </Target>
 </Project>

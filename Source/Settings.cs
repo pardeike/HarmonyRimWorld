@@ -5,6 +5,8 @@ namespace HarmonyMod;
 
 public class Settings : ModSettings
 {
+	// Preserve the saved setting name: the cache now stores reference IDs only,
+	// never permission to suppress a trace that may not have reached any log.
 	[TweakValue("Harmony")] public static bool noStacktraceCaching;
 	[TweakValue("Harmony")] public static bool noStacktraceEnhancing;
 
