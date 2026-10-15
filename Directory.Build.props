@@ -7,7 +7,7 @@
 		<EnableSourceLink>false</EnableSourceLink>
 		<EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
 		<EmbedUntrackedSources>false</EmbedUntrackedSources>
-		<ModVersion>3.0.0.0</ModVersion>
+		<ModVersion>3.0.1.0</ModVersion>
 		<ModInformationalVersion>$(ModVersion)</ModInformationalVersion>
 		<ActiveRimWorldVersion>1.7</ActiveRimWorldVersion>
 		<!-- Include prereleases, but stay on Harmony 3. NuGet chooses the TFM asset. -->
