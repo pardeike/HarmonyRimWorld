@@ -18,6 +18,7 @@ def digest(path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--local-build', action='store_true')
     parser.add_argument('--package-dir', type=Path, required=True)
     parser.add_argument('--built-library', type=Path, required=True)
     parser.add_argument('--metadata-tool', type=Path, required=True)
@@ -29,11 +30,11 @@ def main():
     info = nuspec.find('n:metadata', ns)
     version = info.findtext('n:version', namespaces=ns)
     if info.findtext('n:id', namespaces=ns) != 'Lib.Harmony' or not version.startswith('3.'):
-        raise SystemExit('Expected the official Lib.Harmony 3 package.')
-    if digest(library) != digest(args.built_library):
-        raise SystemExit('NuGet did not select the package\'s native net10.0 Harmony asset.')
+        raise SystemExit('Expected a Lib.Harmony 3 package.')
     metadata = json.loads(subprocess.check_output(
         ['dotnet', str(args.metadata_tool), str(library)], text=True))
+    if digest(library) != digest(args.built_library):
+        raise SystemExit('NuGet did not select the package\'s native net10.0 Harmony asset.')
     if (metadata['TargetFramework'] != '.NETCoreApp,Version=v10.0'
             or not metadata['AnyCPU'] or not metadata['AssemblyVersion'].startswith('3.')):
         raise SystemExit(f'Unexpected Harmony runtime metadata: {metadata}')
@@ -47,26 +48,26 @@ def main():
         'packageAsset': 'lib/net10.0/0Harmony.dll',
         'packageSha256': digest(package_dir / f'lib.harmony.{version}.nupkg'),
         'reportedSourceCommit': repository.get('commit') if repository is not None else None,
-        'origin': f'Official NuGet package Lib.Harmony {version}.',
-        'updatePolicy': 'NuGet selects the newest downloaded Harmony 3 package. scripts/build-release.sh fetches the latest before the offline build.',
+        'origin': f'Local experimental Lib.Harmony {version} package.' if args.local_build else f'Official NuGet package Lib.Harmony {version}.',
+        'updatePolicy': 'Pinned local experimental package. Not published.' if args.local_build else 'NuGet selects the newest downloaded Harmony 3 package. scripts/build-release.sh fetches the latest before the offline build.',
     }
     destination = ROOT / provenance['path']
     record = ROOT / 'Harmony-provenance.json'
-    if destination.is_file() and digest(destination) == provenance['sha256'] and record.is_file():
-        if json.loads(record.read_text()) == provenance:
-            print(f'Using official Lib.Harmony {version} net10.0 (unchanged).')
-            return
+    if (destination.is_file() and digest(destination) == provenance['sha256']
+            and record.is_file() and json.loads(record.read_text()) == provenance):
+        print(f'Using Lib.Harmony {version} net10.0 (unchanged).')
+        return
     backup = ROOT / '.build/library-backups' / str(time.time_ns())
     backup.mkdir(parents=True, mode=0o700)
     for old in (destination, record):
         if old.exists():
             shutil.copy2(old, backup / old.name)
-    staged_library = backup / 'new-0Harmony.dll'
+    staged = backup / 'new-0Harmony.dll'
+    shutil.copy2(library, staged)
     staged_record = backup / 'new-provenance.json'
-    shutil.copy2(library, staged_library)
     staged_record.write_text(json.dumps(provenance, indent=2) + '\n')
     try:
-        staged_library.replace(destination)
+        staged.replace(destination)
         staged_record.replace(record)
     except BaseException:
         for old in (destination, record):
@@ -76,7 +77,7 @@ def main():
             else:
                 old.unlink(missing_ok=True)
         raise
-    print(f'Staged official Lib.Harmony {version} net10.0, SHA-256 {provenance["sha256"]}.')
+    print(f'Staged Lib.Harmony {version} net10.0, SHA-256 {provenance["sha256"]}.')
 
 
 if __name__ == '__main__':

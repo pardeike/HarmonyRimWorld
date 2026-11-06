@@ -1,5 +1,11 @@
 # Building Harmony Mod
 
+The build sets `EnableRuntimeILPatching=true`. The normal wrapper uses standard .NET references.
+The optional `HarmonyMod.RuntimeIL.dll` compiles against the installed runtime's custom core library.
+On Waylith, the wrapper registers that adapter before mod patching. Ordinary runtimes keep the existing path.
+The adapter declines unsupported signatures before selection. Installation failures stay loud.
+Runtime calls and same-target rebuilds require serial, non-reentrant host use.
+
 Run `./scripts/build-release.sh`. It downloads the latest official Harmony 3
 NuGet version, including prereleases, then builds, runs smoke checks, packages
 and installs the mod. No dependency version edits are needed for a new Harmony

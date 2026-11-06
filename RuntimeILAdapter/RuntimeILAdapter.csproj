@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>HarmonyMod.RuntimeIL</AssemblyName>
+    <Version>$(ModVersion)</Version>
+    <OutputPath>bin/$(Configuration)</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DefineConstants>HARMONY_RUNTIME_IL_EXPERIMENT</DefineConstants>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Source/RuntimeILBody.cs" Link="RuntimeILBody.cs" />
+    <Compile Include="../Source/RuntimeILPatching.cs" Link="RuntimeILPatching.cs" />
+    <Reference Include="$(RimWorldAssemblyDir)/System*.dll" Private="false" />
+    <Reference Include="$(RimWorldAssemblyDir)/Waylith.Injection.dll" Private="false" />
+    <PackageReference Include="Lib.Harmony" Version="$(HarmonyLibVersion)" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

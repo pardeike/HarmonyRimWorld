@@ -26,6 +26,8 @@ def payload():
         names.append('About/PublishedFileId.txt')
     names += [f'{version}/Assemblies/{name}' for version in ('1.4', '1.5', '1.6', '1.7')
               for name in ('0Harmony.dll', 'HarmonyMod.dll')]
+    if ET.parse(ROOT / 'Directory.Build.props').getroot().findtext('.//EnableRuntimeILPatching') == 'true':
+        names.append('1.7/Assemblies/HarmonyMod.RuntimeIL.dll')
     for name in names:
         path = ROOT / name
         if not path.is_file() or path.is_symlink():

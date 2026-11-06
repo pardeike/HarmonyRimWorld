@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Harmony.RuntimePipeline.LiveProof</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony"><HintPath>$(HarmonyAssemblyPath)</HintPath><Private>false</Private></Reference>
+    <Reference Include="Waylith"><HintPath>$(GameDirectory)/Waylith.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="RimBridgeServer.Sdk"><HintPath>$(GameDirectory)/../../../Mods/RimBridgeServer/1.7/Assemblies/RimBridgeServer.Sdk.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

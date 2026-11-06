@@ -49,15 +49,21 @@ def run(command, cwd, log, env):
 
 def game_runtime_smoke(game, output, env):
     runner = BUILD / 'game-runtime-smoke'
-    runner.mkdir(exist_ok=True)
+    # Start empty, so a file from an earlier build cannot stand in for a missing payload dependency.
+    shutil.rmtree(runner, ignore_errors=True)
+    runner.mkdir()
     for path in game.iterdir():
         if path.is_file() and (path.name.startswith(('System.', 'Microsoft.', 'libcoreclr', 'libclrgc', 'libclrjit', 'libhost', 'libSystem.')) or path.name in ('mscorlib.dll', 'netstandard.dll', 'createdump')):
             shutil.copy2(path, runner / path.name)
     shutil.copy2(game / 'RimWorld', runner / 'RimWorld')
     shutil.copy2(game / 'RimWorld.runtimeconfig.json', runner / 'RimWorld.runtimeconfig.json')
     shutil.copy2(output / 'Smoke.dll', runner / 'RimWorld.dll')
+    # The payload as shipped: Harmony and the mod.
     for name in ('0Harmony.dll', 'HarmonyMod.dll'):
-        shutil.copy2(output / name, runner / name)
+        shutil.copy2(ROOT / '1.7/Assemblies' / name, runner / name)
+    adapter = ROOT / '1.7/Assemblies/HarmonyMod.RuntimeIL.dll'
+    if adapter.exists():
+        shutil.copy2(adapter, runner / adapter.name)
     deps = json.loads((game / 'RimWorld.deps.json').read_text())
     fixture = json.loads((output / 'Smoke.deps.json').read_text())
     target = deps['targets'][deps['runtimeTarget']['name']]
@@ -188,11 +194,12 @@ def main():
     if not args.package_only:
         print('Restoring from downloaded local packages and building the .NET 10 / 1.7 mod.', flush=True)
         for project in ('Source/HarmonyRimWorld.csproj', 'Tests/Smoke/Smoke.csproj'):
-            run(['dotnet', 'restore', project, '--configfile', str(ROOT / 'nuget.config'),
+            run(['dotnet', 'restore', project, '-m:1', '--configfile', str(ROOT / 'nuget.config'),
                  '--force-evaluate', '-p:RestoreLockedMode=false', '-p:NuGetAudit=false', '--verbosity', 'quiet'],
                 ROOT, BUILD / ('mod-restore.log' if project.startswith('Source/') else 'smoke-restore.log'), env)
-        run(['dotnet', 'build', 'Source/HarmonyRimWorld.csproj', '--no-restore', '-c', 'Release', f'-p:RimWorldAssemblyDir={game}', '-p:UseSharedCompilation=false', '--disable-build-servers', '--verbosity', 'quiet'], ROOT, BUILD / 'mod-build.log', env)
-        run(['dotnet', 'run', '--project', 'Tests/Smoke/Smoke.csproj', '--no-restore', '-c', 'Release', f'-p:RimWorldAssemblyDir={game}', '-p:UseSharedCompilation=false', '--disable-build-servers', '--verbosity', 'quiet'], ROOT, BUILD / 'smoke.log', env)
+        run(['dotnet', 'build', 'Source/HarmonyRimWorld.csproj', '-m:1', '--no-restore', '-c', 'Release', f'-p:RimWorldAssemblyDir={game}', '-p:UseSharedCompilation=false', '--disable-build-servers', '--verbosity', 'quiet'], ROOT, BUILD / 'mod-build.log', env)
+        run(['dotnet', 'build', 'Tests/Smoke/Smoke.csproj', '--no-restore', '-c', 'Release', f'-p:RimWorldAssemblyDir={game}', '-p:UseSharedCompilation=false', '--disable-build-servers', '--verbosity', 'quiet'], ROOT, BUILD / 'smoke-build.log', env)
+        run(['dotnet', str(ROOT / 'Tests/Smoke/bin/Release/net10.0/Smoke.dll')], ROOT, BUILD / 'smoke.log', env)
         for mode in ('custom', 'disabled'):
             run(['dotnet', str(ROOT / 'Tests/Smoke/bin/Release/net10.0/Smoke.dll'), mode],
                 ROOT, BUILD / f'smoke-log-{mode}.log', env)

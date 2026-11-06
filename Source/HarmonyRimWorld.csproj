@@ -28,6 +28,15 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(EnableRuntimeILPatching)' == 'true'">
+    <DefineConstants>$(DefineConstants);HARMONY_RUNTIME_IL_HOST</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(HarmonyLocalBuild)' == 'true'">
+    <LocalHarmonyProvenanceArgument>--local-build</LocalHarmonyProvenanceArgument>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(EnableRuntimeILPatching)' == 'true'">
+    <ProjectReference Include="../RuntimeILAdapter/RuntimeILAdapter.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="$(HarmonyLibVersion)" GeneratePathProperty="true" PrivateAssets="all" />
     <ProjectReference Include="../Tools/AssemblyMetadata/AssemblyMetadata.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
@@ -53,8 +62,9 @@
   </Target>
   <Target Name="StageMod" AfterTargets="Build">
     <MakeDir Directories="$(MSBuildProjectDirectory)/../$(ActiveRimWorldVersion)/Assemblies" />
-    <Exec LogStandardErrorAsError="true" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/stage-harmony.py&quot; --package-dir &quot;$(PkgLib_Harmony)&quot; --built-library &quot;$(TargetDir)0Harmony.dll&quot; --metadata-tool &quot;$(MSBuildProjectDirectory)/../Tools/AssemblyMetadata/bin/$(Configuration)/net10.0/AssemblyMetadata.dll&quot;" />
+    <Exec LogStandardErrorAsError="true" Command="python3 -I &quot;$(MSBuildProjectDirectory)/../scripts/stage-harmony.py&quot; $(LocalHarmonyProvenanceArgument) --package-dir &quot;$(PkgLib_Harmony)&quot; --built-library &quot;$(TargetDir)0Harmony.dll&quot; --metadata-tool &quot;$(MSBuildProjectDirectory)/../Tools/AssemblyMetadata/bin/$(Configuration)/net10.0/AssemblyMetadata.dll&quot;" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)/../$(ActiveRimWorldVersion)/Assemblies" />
+    <Copy Condition="'$(EnableRuntimeILPatching)' == 'true'" SourceFiles="$(MSBuildProjectDirectory)/../RuntimeILAdapter/bin/$(Configuration)/HarmonyMod.RuntimeIL.dll" DestinationFolder="$(MSBuildProjectDirectory)/../$(ActiveRimWorldVersion)/Assemblies" />
     <XmlPoke XmlInputPath="$(MSBuildProjectDirectory)/../About/About.xml" Query="//ModMetaData/modVersion" Value="$(ModInformationalVersion)" />
     <XmlPoke XmlInputPath="$(MSBuildProjectDirectory)/../About/Manifest.xml" Query="//Manifest/version" Value="$(ModVersion)" />
   </Target>
