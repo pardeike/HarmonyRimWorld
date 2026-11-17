@@ -1,15 +1,15 @@
 {
   "path": "1.7/Assemblies/0Harmony.dll",
-  "sha256": "953e6ba29f0e0be22ad3a01be9164202188ddcb1e6ef13da31d22bded7000465",
+  "sha256": "55335d0349f4ab63a00253ad413ba08e97a3a103e0df752c6bd83bdf26daa6c1",
   "assemblyVersion": "3.0.0.0",
-  "informationalVersion": "3.0.0.0-rc.5+b3baddafcfcd733024970054b844a985f15d791d",
+  "informationalVersion": "3.0.0.0-rc.6+4b00c0bdf73f47a14afa78636ce9ddb9dc70d1ad",
   "targetFramework": "net10.0",
   "anyCPU": true,
   "packageId": "Lib.Harmony",
-  "packageVersion": "3.0.0-rc.5",
+  "packageVersion": "3.0.0-rc.6",
   "packageAsset": "lib/net10.0/0Harmony.dll",
-  "packageSha256": "243f562f7151c174b0e94df661a142d352a84a8a1dde71dfc2cf5baa45020161",
-  "reportedSourceCommit": "b3baddafcfcd733024970054b844a985f15d791d",
-  "origin": "Official NuGet package Lib.Harmony 3.0.0-rc.5.",
+  "packageSha256": "02c61d1cf476ad37afed8368793fa255fc500e714a10014a000528721edeca53",
+  "reportedSourceCommit": "4b00c0bdf73f47a14afa78636ce9ddb9dc70d1ad",
+  "origin": "Official NuGet package Lib.Harmony 3.0.0-rc.6.",
   "updatePolicy": "NuGet selects the newest downloaded Harmony 3 package. scripts/build-release.sh fetches the latest before the offline build."
 }
