@@ -7,7 +7,7 @@
 		<EnableSourceLink>false</EnableSourceLink>
 		<EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
 		<EmbedUntrackedSources>false</EmbedUntrackedSources>
-		<ModVersion>3.0.3.0</ModVersion>
+		<ModVersion>3.0.4.0</ModVersion>
 		<EnableRuntimeILPatching>true</EnableRuntimeILPatching>
 		<BuildInParallel>false</BuildInParallel>
 		<ModInformationalVersion>$(ModVersion)</ModInformationalVersion>

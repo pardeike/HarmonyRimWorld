@@ -5,8 +5,8 @@
       "Lib.Harmony": {
         "type": "Direct",
         "requested": "[3.*-*, )",
-        "resolved": "3.0.0-rc.6",
-        "contentHash": "N0IxzNefzp5ubJ/0Q8loEiz6aM2Z1jgr7aj1NrUYHGZF3p/zr7xoWiFWGOkgxZGDvFNfE/1Qczj0bdviK7I3KA=="
+        "resolved": "3.0.0-rc.7",
+        "contentHash": "XgNE/BlkcuNj8b7DCo24gSTcbWmwvWhPdvIt1htKgX6qXmCTmDOX6YoWCkekCMDIycYdtv/f0O5DCAHwSCRXeg=="
       }
     }
   }
